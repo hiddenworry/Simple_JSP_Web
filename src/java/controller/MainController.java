@@ -38,6 +38,7 @@ public class MainController extends HttpServlet {
     private static final String REMOVE_CART_CONTROLLER = "RemoveCartController";
     private static final String EDIT_CART = "EditCart";
     private static final String EDIT_CART_CONTROLLER = "EditCartController";
+   
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -45,7 +46,8 @@ public class MainController extends HttpServlet {
         try {
             String action = request.getParameter("action");
             String loginCode = request.getParameter("code");
-            if (LOGIN.equals(action) || loginCode != null) {
+            if ((LOGIN.equals(action) || loginCode != null)) {
+                
                 url = LOGIN_CONTROLLER;
             }
             else if (SEARCH.equals(action)){

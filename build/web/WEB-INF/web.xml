@@ -45,8 +45,8 @@
         <servlet-class>controller.EditCartController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ViewImage</servlet-name>
-        <servlet-class>controller.ViewImage</servlet-class>
+        <servlet-name>RemoveCartController</servlet-name>
+        <servlet-class>controller.RemoveCartController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>MainController</servlet-name>
@@ -89,8 +89,8 @@
         <url-pattern>/EditCartController</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ViewImage</servlet-name>
-        <url-pattern>/ViewImage</url-pattern>
+        <servlet-name>RemoveCartController</servlet-name>
+        <url-pattern>/RemoveCartController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

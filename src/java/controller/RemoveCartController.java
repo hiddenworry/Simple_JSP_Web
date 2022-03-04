@@ -20,26 +20,32 @@ import shopping.Cart;
  */
 public class RemoveCartController extends HttpServlet {
 
-    private static final String ERROR = "error.jsp";
-    private static final String SUCCESS = "viewCart.jsp";
+    private static final String ERROR = "viewcart.jsp";
+    private static final String SUCCESS = "viewcart.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
-            // Get cacs param nhu gia, id , ten, quantity, new quantity
+            boolean check = false;
+            String productID = request.getParameter("productID");
             HttpSession session = request.getSession();
             if (session != null) {
                 Cart cart = (Cart) session.getAttribute("CART");
                 if (cart != null) {
-                    if (cart.getCart().containsKey("ID")) {
-                        ProductDTO product = cart.getCart().get("ID");
-                        cart.removeCart("ID");
-                        request.setAttribute("CART", cart);
-                        url = SUCCESS;
+                    if (cart.getCart().containsKey(productID)) {
+                        //ProductDTO product = cart.getCart().get(productID);
+                        check = cart.removeCart(productID);
+                        if (check) {
+                            request.setAttribute("CART", cart);
+                            url = SUCCESS;
+                        }
                     }
-
+                    
+                    if (cart.getCart().isEmpty()) {
+                        request.setAttribute("MESSAGE", "Your card is empty!!!");
+                    }
                 }
 
             }

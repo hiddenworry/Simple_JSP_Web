@@ -3,16 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/web/viewcart.jsp</file>
             <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/controller/MainController.java</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/product/ProductDTO.java</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/web/viewImage.jsp</file>
+            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/controller/AddToCartController.java</file>
+            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/controller/SearchController.java</file>
             <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/product/ProductDAO.java</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/web/createProduct.jsp</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/web/error.jsp</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/product/ProductError.java</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/web/admin.jsp</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/controller/CreateProductController.java</file>
-            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/src/java/controller/UpdateController.java</file>
+            <file>file:/E:/SPRING2022/PRJ301/Asignment/VegetableStrore/web/user.jsp</file>
         </group>
     </open-files>
 </project-private>

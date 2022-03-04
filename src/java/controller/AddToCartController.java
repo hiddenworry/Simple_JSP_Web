@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import product.ProductDAO;
 import product.ProductDTO;
 import shopping.Cart;
 
@@ -19,29 +20,44 @@ import shopping.Cart;
  * @author ADMIN
  */
 public class AddToCartController extends HttpServlet {
+
     private static final String ERROR = "error.jsp";
-    private static final String SUCCESS = "viewCart.jsp";
+    private static final String SUCCESS = "SearchController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
+        ProductDAO dao = new ProductDAO();
+        ProductDTO product = null;
         try {
             // Get cacs param nhu gia, id , ten, quantity
             HttpSession session = request.getSession();
-            if (session != null){
-                Cart cart = (Cart)session.getAttribute("CART");
+            boolean check = false;
+            if (session != null) {
+                Cart cart = (Cart) session.getAttribute("CART");
                 if (cart == null) {
                     cart = new Cart();
                 }
-                ProductDTO product = new ProductDTO("", "", 0, 0);
-                cart.addToCart(product);
-                session.setAttribute("CART", cart);
-                request.setAttribute("MESSAGE", "Add successfully!!!");
+                String productID = request.getParameter("productID");
+                product = dao.searchProductForSales(productID);
+                // moi lan chi duoc them 1 san pham vao gio hang
+                if (product != null) {
+
+                    check = cart.addToCart(product);
+                    if (check) {
+                        session.setAttribute("CART", cart);
+                        url = SUCCESS;
+
+                    } else {
+
+                    }
+
+                }
             }
-        
-        } catch (Exception e){
-            log("Error at AdtToCartController: " + e.toString());
+
+        } catch (Exception e) {
+            log("Error at AddToCartController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

@@ -10,7 +10,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBUtils;
@@ -22,11 +21,13 @@ import utils.DBUtils;
 public class ProductDAO {
 
     private static final String GET_PRODUCT_CATE_LIST = "SELECT categoryID, categoryName from tblCategory";
-    private static final String SEARCH_PRODUCT = "SELECT productID, productName, price, quantity, categoryID, importDate, usingDate, image from tblProduct WHERE productName like ?";
+    private static final String SEARCH_PRODUCT_ADMIN = "SELECT productID, productName, price, quantity, categoryID, importDate, usingDate, image from tblProduct WHERE productName like ?";
+    private static final String SEARCH_PRODUCT_USER = "SELECT productID, productName, price, quantity, categoryID, importDate, usingDate, image from tblProduct WHERE productName like ? and usingDate>?";
     private static final String DELETE_PRODUCT = "DELETE tblProduct WHERE productID=?";
     private static final String UPDATE_PRODUCT = "UPDATE tblProduct SET productName=?, price=?, quantity=?, importDate=?, usingDate=?, image=? WHERE productID=?";
     private static final String INSERT_PRODUCT = "INSERT INTO tblProduct (productID, productName, price, quantity, categoryID, importDate, usingDate, image) VALUES (?, ? , ? , ? , ?, ?, ?, ? )";
     private static final String CHECK_DUPLICATED = "SELECT productID FROM tblProduct where productID =?";
+    private static final String SEARCH_PRODUCT_BY_ID = "SELECT productName, price, quantity from tblProduct WHERE productID = ?";
 
     public boolean checkDuplicated(String productID) throws SQLException {
         Connection conn = null;
@@ -64,8 +65,9 @@ public class ProductDAO {
         return check;
 
     }
+// Search all product in the database, use for admin to control the product quality
 
-    public List<ProductDTO> searchProductByName(String searchStr) throws SQLException {
+    public List<ProductDTO> searchProductForAdmin(String searchStr) throws SQLException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -74,7 +76,7 @@ public class ProductDAO {
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                ps = conn.prepareStatement(SEARCH_PRODUCT);
+                ps = conn.prepareStatement(SEARCH_PRODUCT_ADMIN);
                 ps.setString(1, "%" + searchStr + "%");
                 rs = ps.executeQuery();
                 while (rs.next()) {
@@ -91,7 +93,7 @@ public class ProductDAO {
                 }
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         } finally {
             if (rs != null) {
                 rs.close();
@@ -105,6 +107,90 @@ public class ProductDAO {
 
         }
         return list;
+    }
+
+    // Search and return the list of product that has importDay < usingDate
+    public List<ProductDTO> searchProductForUser(String searchStr) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<ProductDTO> list = new ArrayList<>();
+        Date today = new Date(System.currentTimeMillis()); // get current date
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                ps = conn.prepareStatement(SEARCH_PRODUCT_USER);
+                ps.setString(1, "%" + searchStr + "%");
+                ps.setDate(2, today);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    String productID = rs.getString("productID");
+                    String productName = rs.getNString("productName");
+                    double price = rs.getDouble("price");
+                    int quantity = rs.getInt("quantity");
+                    String categoryID = rs.getString("categoryID");
+                    String importDate = rs.getString("importDate");
+                    String usingDate = rs.getString("usingDate");
+                    String imageLink = rs.getString("image");
+                    ProductDTO product = new ProductDTO(productID, productName, price, quantity, categoryID, importDate, usingDate, imageLink);
+                    list.add(product);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return list;
+    }
+
+    // Search Product by ID for Sales
+    public ProductDTO searchProductForSales(String productID) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        ProductDTO product = null;
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                ps = conn.prepareStatement(SEARCH_PRODUCT_BY_ID);
+                ps.setString(1, productID);
+                rs = ps.executeQuery();
+                while (rs.next()) {
+
+                    String productName = rs.getNString("productName");
+                    double price = rs.getDouble("price");
+                    int quantity = rs.getInt("quantity");
+                    product = new ProductDTO(productID, productName, price, quantity);
+                  
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return product;
     }
 
     //Delete
@@ -160,7 +246,7 @@ public class ProductDAO {
                 ps.setDate(5, usingDate);
                 ps.setString(6, product.getImageLink());
                 ps.setString(7, product.getProductID());
-                
+
                 check = ps.executeUpdate() > 0 ? true : false;
 
             }
@@ -202,8 +288,8 @@ public class ProductDAO {
                 Date importDate = Date.valueOf(product.getImportDate());
                 Date usingDate = Date.valueOf(product.getUsingDate());
                 ps.setDate(6, importDate);
-                ps.setDate(7,usingDate);
-                ps.setString(8,product.getImageLink());
+                ps.setDate(7, usingDate);
+                ps.setString(8, product.getImageLink());
                 check = ps.executeUpdate() > 0 ? true : false;
 
             }

@@ -1,19 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Dosis:wght@300&display=swap');
 
-.Shopping-icon i {
-   position: fixed;
-   top: 50%;
-   left: 5%;
-    
+.Shopping-icon i{
+    position: fixed;
+    top: 50%;
+    left: 5%;
+
+}
+.Shopping-icon a{
+    position: fixed;
+    top: 57%;
+    left: 4.5%;
+
+
 }
 
+
 .nav-bar  {
-   background-color: #2BAE66FF;
-   height: 4.5em;
-   text-align: center;
-   align-items: center;
-   
-   
+    background-color: #2BAE66FF;
+    height: 4.5em;
+    text-align: center;
+    align-items: center;
+
+
 }
 .nav-bar a {
     color: #FCF6F5FF;
@@ -31,15 +39,16 @@
 
 .shopping-cart {
     margin-top: 3%;
+    margin-left: 20%;
 }
 .show-cart li {
-  display: flex;
+    display: flex;
 }
 .card {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 .card-img-top {
-  width: 200px;
-  height: 200px;
-  align-self: center;
+    width: 200px;
+    height: 200px;
+    align-self: center;
 }

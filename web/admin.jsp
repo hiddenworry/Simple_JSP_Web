@@ -39,7 +39,7 @@
         <h1>Hello <%=admin.getFullName()%> </h1>
 
         <form action="MainController" method="POST">
-            <input type="text" name="Search" value=<%=searchStr%>>
+            <input type="text" name="Search" value="<%=searchStr%>">
             <input type="submit" name="action" value="Search">   
 
         </form>
@@ -65,14 +65,30 @@
                     <th>importDate</th>
                     <th>usingDate</th>
                     <th>Image</th>
+                    <td>Update</td>
+                    <th>Delete</th>
+                    <th>Status</th>
 
                 </tr>
 
 
             </thead>
             <tbody>
-                <%   for (ProductDTO product : productList) {
+                <%  String status = "";
+                    String color = "";
+                    ProductError expiredError = new ProductError();
+                    for (ProductDTO product : productList) {
+                            // check ngay het han cua san pham
+                            String importDate = product.getImportDate();
+                            String usingDate = product.getUsingDate();
+                            if ( !expiredError.isValidDateError(importDate, usingDate )){
+                                status = "Expired";
+                                color = "red";
 
+                            } else{
+                                status = "Usable";
+                                color = "green";
+                            }
                 %>
                 <tr>
             <form action="MainController" method="POST" enctype="multipart/form-data">
@@ -97,7 +113,7 @@
                 <td> <%=product.getCategoryID()%></td>
                 <td> <input type="text" value="<%=product.getImportDate()%>" name="importDate"></td>
                 <td> <input type="text" value="<%=product.getUsingDate()%>" name="usingDate"></td>
-                <td> <a href="viewImg.jsp?imgUrl=<%=product.getImageLink()%>" style="text-align: center">  View</a><input name="imagePath" type="file" style="margin-left: 20px"value="<%= product.getImageLink()%>"></td>
+                <td> <a href="<%=product.getImageLink()%>" style="text-align: center">  View</a><input name="imagePath" type="text" style="margin-left: 20px"value="<%= product.getImageLink()%>"></td>
                 <td>
                     <input type="submit" name="action" value="Update">
                 </td>
@@ -112,6 +128,8 @@
                     <input type="submit" name="action" value="Delete">
                 </form>
             </td>
+            
+            <td style="color: <%=color%>"><%=status%></td>
 
         </tr>
 
@@ -128,7 +146,9 @@
 </table>
 <%
     ProductError error = (ProductError) request.getAttribute("ERROR");
+%>
 
+<%
     String errorMessage;
     if (error == null) {
         errorMessage = "";

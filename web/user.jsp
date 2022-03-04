@@ -4,6 +4,8 @@
     Author     : ADMIN
 --%>
 
+<%@page import="java.util.List"%>
+<%@page import="product.ProductDTO"%>
 <%@page import="user.UserDTO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -19,21 +21,29 @@
         <title>Organic Store</title>
     </head>
     <body>
-       
+
         <div class="container-fluid">
-             <div class="Shopping-icon">
-            <i class="fa fa-shopping-cart" style="font-size:50px"></i>
             
-        </div>
+                <div class="Shopping-icon">
+                    <i class="fa fa-shopping-cart" style="font-size:50px"></i>
+                    <a id="view-cart-btn" href="viewcart.jsp">View Cart</a>
+
+                </div>
+         
             <div class="nav-bar container-fluid row">
 
                 <div class="logo col-md-2">
                     <a href=""> ORGANIC </a>
                 </div>
                 <div class="search col-md-7">
-                    <form action="SearchServlet">
-                        <input class="input-search" type="text" name="search" placeholder="Nhập sản phẩm bạn muốn mua"/>
-                        <input type="submit" value="Tìm Kiếm"/>
+                    <%
+                        String searchStr = request.getParameter("Search");
+                        if (searchStr == null || searchStr.isEmpty()) searchStr = "%";
+                    %>
+                    <form action="MainController">
+                        <input class="input-search" type="text" name="Search" placeholder="Nhập sản phẩm bạn muốn mua"/>
+
+                        <input type="submit" name="action" value="Search"/>
                     </form>
                 </div>
                 <div class="login col-md-2"> 
@@ -58,46 +68,50 @@
                     <a href="MainController?action=LogOut">Log Out</a>
                 </div>
 
-
-
             </div>
-
-
-
 
             <!-- Main -->
             <div class="container shopping-cart">
                 <div class="row">
-                    <div class="col">
-                        <div class="card" style="width: 20rem;">
-                            <img class="card-img-top" src="http://www.azspagirls.com/files/2010/09/orange.jpg" alt="Card image cap">
-                            <div class="card-block">
-                                <h4 class="card-title">Orange</h4>
-                                <p class="card-text">Price: $0.5</p>
-                                <a href="#" data-name="Orange" data-price="0.5" class="add-to-cart btn btn-primary">Add to cart</a>
-                            </div>
+                    <%
+
+                        List<ProductDTO> productList = (List<ProductDTO>) request.getAttribute("productList");
+                        if (productList != null) {
+                    %>
+
+                    <%
+                        if (!productList.isEmpty()) {
+                            for (ProductDTO product : productList) {
+
+                    %>
+
+                    <div class="card" style="width: 20rem;">
+                        <img class="card-img-top" src="<%= product.getImageLink()%>" alt="Card image cap">
+                        <div class="card-block">
+                            <form method="POST" action="MainController">
+                            <h4 class="card-title"><%=product.getProductName()%></h4>
+                            <p class="card-text">Price: $<%=product.getPrice()%></p>
+                            <input hidden="" value="<%=product.getProductID()%>" type="text" name="productID">
+                            <input  type="submit" name="action" value="AddToCart" class="add-to-cart btn btn-primary">
+                            <input type="text"  hidden="" name="Search" value="<%=searchStr%>">
+                            </form>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="card" style="width: 20rem;">
-                            <img class="card-img-top" src="http://images.all-free-download.com/images/graphicthumb/vector_illustration_of_ripe_bananas_567893.jpg" alt="Card image cap">
-                            <div class="card-block">
-                                <h4 class="card-title">Banana</h4>
-                                <p class="card-text">Price: $1.22</p>
-                                <a href="#" data-name="Banana" data-price="1.22" class="add-to-cart btn btn-primary">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card" style="width: 20rem;">
-                            <img class="card-img-top" src="https://3.imimg.com/data3/IC/JO/MY-9839190/organic-lemon-250x250.jpg" alt="Card image cap">
-                            <div class="card-block">
-                                <h4 class="card-title">Lemon</h4>
-                                <p class="card-text">Price: $5</p>
-                                <a href="#" data-name="Lemon" data-price="5" class="add-to-cart btn btn-primary">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
+
+
+                    <%           }
+                            }
+                        }
+
+
+                    %>
+
+                    <%                    String error = (String) request.getAttribute("ERROR");
+                        if (error == null) {
+                            error = "";
+                        }
+                    %>
+                    <div style="color: graytext"><%=error%></div>
                 </div>
             </div>
 

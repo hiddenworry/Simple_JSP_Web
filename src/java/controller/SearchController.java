@@ -11,35 +11,68 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import product.ProductDAO;
 import product.ProductDTO;
+import user.UserDTO;
 
 /**
  *
  * @author ADMIN
  */
 public class SearchController extends HttpServlet {
-    private static final String ERROR = "admin.jsp";
-    private static final String SUCCESS = "admin.jsp";
-    
+
+    private static final String ERROR = "login.jsp";
+    private static final String ADMIN_PAGE = "admin.jsp";
+    private static final String USER_PAGE = "user.jsp";
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
             String searchVal = request.getParameter("Search");
-            ProductDAO dao = new ProductDAO();
-            List<ProductDTO> productList = dao.searchProductByName(searchVal);
-            if (!productList.isEmpty()){
-                request.setAttribute("productList", productList);
+            /// Bien nay dung de search all product, va tra ve trang user trong lan login dau tien
+            String searchAllProduct = (String) request.getAttribute("GET_ALL_PRODUCT");
+            if (searchVal == null) {
+                searchVal = searchAllProduct;
             }
-        
-        
+
+            /// Xac nhan xem ai dang Login (User hoac Admin)
+            HttpSession session = request.getSession();
+            if (session == null) {
+                response.sendRedirect("login.jsp");
+                return;
+
+            }
+            ProductDAO dao = new ProductDAO();
+            List<ProductDTO> productList = null;
+            UserDTO user = (UserDTO) session.getAttribute("USER");
+            if (user.isAdmin()) {
+                url = ADMIN_PAGE;
+                productList = dao.searchProductForAdmin(searchVal);
+
+            } else if (!user.isAdmin()) {
+
+                url = USER_PAGE;
+                productList = dao.searchProductForUser(searchVal);
+            } else {
+                request.setAttribute("ERROR", "Your Role is not support!!!");
+
+            }
+
+            if (!productList.isEmpty() || productList != null) {
+                request.setAttribute("productList", productList);
+
+            } else {
+                request.setAttribute("ERROR", "The product not found!!!");
+
+            }
         } catch (Exception e) {
             log("Error at LoginController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
-            
+
         }
     }
 

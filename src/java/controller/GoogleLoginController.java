@@ -20,41 +20,43 @@ import user.UserDTO;
  * @author ADMIN
  */
 public class GoogleLoginController extends HttpServlet {
+
     private static final String ERROR = "login.jsp";
-    private static final String HOME_PAGE = "user.jsp";
-    
+    private static final String SUCCESS = "SearchController";
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
             // Google
-           String code = request.getParameter("code");
+            String code = request.getParameter("code");
             //System.out.println(code);
-           String accessToken = GoogleAccountDAO.getToken(code);
-           GoogleAccountDTO  account = GoogleAccountDAO.getUserInfo(accessToken);
-           if (account != null) {
-               url = HOME_PAGE;
-               UserDTO user = new UserDTO();
-               user.setFullName(account.getEmail());
-               HttpSession session = request.getSession();
-               session.setAttribute("USER", user);
-          }
-           else {
-               request.setAttribute("ERROR", "Login failed, try again!!!");
-           
-           
-           } 
-               
-        
-        
+            String accessToken = GoogleAccountDAO.getToken(code);
+            GoogleAccountDTO account = GoogleAccountDAO.getUserInfo(accessToken);
+            if (account != null) {
+                url = SUCCESS;
+                // Forworad vao SearchController de render ra view cho nguoi dung
+                UserDTO user = new UserDTO();
+                user.setFullName(account.getEmail());
+                user.setRoleID(false);
+                HttpSession session = request.getSession();
+                session.setAttribute("USER", user);
+                request.setAttribute("GET_ALL_PRODUCT", "%");
+            } else {
+                request.setAttribute("ERROR", "Login failed, try again!!!");
+
+            }
+
         } catch (Exception e) {
             log("Error occured at GoogleLoginController : " + e.toString());
         } finally {
+            // Gui vao search controller de search product va render ra view
             request.getRequestDispatcher(url).forward(request, response);
-        
+            
+
         }
-        
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

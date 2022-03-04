@@ -69,7 +69,7 @@
                     <span>ProductName</span><input type="text" name="productName" required="" class="input"><span class="Error"><%=error.getProductNameError()%></span><br>
                     <span>Price</span><input type="number" name="price" required="" class="input"><span class="Error"><%=error.getProductPrice()%></span><br>
                     <span>Quantity</span><input type="number" name="quantity" required="" class="input"> <span class="Error"><%=error.getProductQuantityError()%></span><br>
-                    <span>Upload image<input name="imagePath" type="file" required=""></span>
+                    <span>Upload image<input name="imagePath" type="text" required=""></span>
                 </div>
                 <!--            Category-->
                 <div>
@@ -112,7 +112,7 @@
                             String message = (String)request.getAttribute("MESSAGE");
                             if (message == null) message = "";
                             %>
-                    <div><%=message%></div>  
+                            <div style="text-align: center; color: green;"><%=message%></div>  
         </div>
 
     </body>

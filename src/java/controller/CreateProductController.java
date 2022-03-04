@@ -5,13 +5,11 @@
  */
 package controller;
 
-import java.io.File;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import product.ProductDAO;
 import product.ProductDTO;
 import product.ProductError;
@@ -37,8 +35,8 @@ public class CreateProductController extends HttpServlet {
             int quantity = Integer.parseInt(request.getParameter("quantity"));
             String category = request.getParameter("category");
             String categoryID = category.split("-", category.length())[0];
-            Part imgPart = request.getPart("imagePath");
-            String imgLink = "";
+            
+            String imgLink = request.getParameter("imagePath");
             //Date handler
             String importDate = request.getParameter("importDate");
             String usingDate = request.getParameter("usingDate");
@@ -87,21 +85,15 @@ public class CreateProductController extends HttpServlet {
             }
 
             // Xu ly file ảnh
-            if (imgPart.getSize() != 0) {
+            if (imgLink == null) {
+                    proError.setImageError("The image is not available!!!");
+                    validation = false;
+             
 
-                String filename = imgPart.getSubmittedFileName();
-                imgLink = request.getServletContext().getRealPath("/" + "img" + File.separator + filename);
-                // Check file exist in img Folder
-                File file = new File(imgLink);
-                if (!file.exists()) {
-                    imgPart.write(imgLink);
+            } 
+               
 
-                }
-
-            } else {
-                proError.setImageError("The image is not available!!!");
-
-            }
+            
             if (validation) {
                 ProductDTO product = new ProductDTO(productID, productName, price, quantity, categoryID, importDate, usingDate, imgLink);
                 check = dao.insert(product);

@@ -5,13 +5,11 @@
  */
 package controller;
 
-import java.io.File;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import product.ProductDAO;
 import product.ProductDTO;
 import product.ProductError;
@@ -38,8 +36,7 @@ public class UpdateController extends HttpServlet {
             int quantity = Integer.valueOf(request.getParameter("quantity"));
             String importDate = request.getParameter("importDate");
             String usingDate = request.getParameter("usingDate");
-            Part imgPart = request.getPart("imagePath");
-            String imgLink = "";
+            String imgLink = request.getParameter("imagePath");
             // get position of the data for Catch Error
             String position = request.getParameter("position");
             ProductError proError = new ProductError();
@@ -76,17 +73,9 @@ public class UpdateController extends HttpServlet {
             }
 
             // Xu ly file ảnh
-            if (imgPart.getSize() != 0) {
-
-                String filename = imgPart.getSubmittedFileName();
-                imgLink = request.getServletContext().getRealPath("/" + "img" + File.separator + filename);
-                File file = new File(imgLink);
-                if (!file.exists()) {
-                    imgPart.write(imgLink);
-
-                }
-
-            } else {
+            if (imgLink == null) {
+                proError.setImageError("The image is not available!!!");
+                validation = false;
 
             }
 
