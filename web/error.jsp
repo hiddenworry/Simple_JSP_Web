@@ -9,15 +9,16 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Error Page</title>
     </head>
     <body>
         <%
-            String error = request.getParameter("ERROR");
+            String error = (String)request.getAttribute("ERROR");
             if (error == null) {
                 error = "";
             }
         %>
-        <%=error%>
+        <h2 style="color: red"><%=error%></h2>
+        
     </body>
 </html>

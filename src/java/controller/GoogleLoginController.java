@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import user.UserDAO;
 import user.UserDTO;
 
 /**
@@ -28,6 +29,7 @@ public class GoogleLoginController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
+        boolean check = false;
         try {
             // Google
             String code = request.getParameter("code");
@@ -36,9 +38,22 @@ public class GoogleLoginController extends HttpServlet {
             GoogleAccountDTO account = GoogleAccountDAO.getUserInfo(accessToken);
             if (account != null) {
                 url = SUCCESS;
+                String userID = account.getId();
+                String email = account.getEmail();
                 // Forworad vao SearchController de render ra view cho nguoi dung
+                UserDAO dao = new UserDAO();
+                // chekc whether th account is exist on the databse
+                
+                // if the account is new user, then insert it into database 
+                if (!dao.checkExist(userID)){
+                    dao.insertGoogleUser(userID,email,email);
+                        // set fullname and email is gmail bacuse the return fullname is null
+                }
                 UserDTO user = new UserDTO();
-                user.setFullName(account.getEmail());
+                user.setUserID(userID);
+               
+                user.setFullName(email);// set fullname is email
+                user.setEmail(email);
                 user.setRoleID(false);
                 HttpSession session = request.getSession();
                 session.setAttribute("USER", user);

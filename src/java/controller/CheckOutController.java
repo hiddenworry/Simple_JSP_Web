@@ -11,52 +11,61 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import product.ProductDTO;
+import order.Order;
 import shopping.Cart;
+import user.UserDTO;
 
 /**
  *
  * @author ADMIN
  */
-public class EditCartController extends HttpServlet {
+public class CheckOutController extends HttpServlet {
 
-    private static final String ERROR = "viewcart.jsp";
-    private static final String SUCCESS = "viewcart.jsp";
+    private static final String ERROR = "error.jsp";
+    private static final String SUCCESS = "success.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
-        boolean check = false;
         try {
-            // Get cacs param nhu gia, id , quantity, new quantity
-            String productID = request.getParameter("productID");
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            
             HttpSession session = request.getSession();
+            
+            boolean check = false;
             if (session != null) {
                 Cart cart = (Cart) session.getAttribute("CART");
-                if (cart != null) {
-                    if (cart.getCart().containsKey(productID)) {
-                        ProductDTO product = cart.getCart().get(productID);
-                        product.setQuantity(quantity);
-                        
-                        check = cart.editCart(productID, product);
-                        if (check){
-                            request.setAttribute("CART", cart);
-                            url = SUCCESS;
-                        }
+                UserDTO user = (UserDTO) session.getAttribute("USER");
+                if (cart != null || !cart.getCart().isEmpty()) {
+                    Order order = new Order();
+                    
+                    
+                    
+                    
+                    check = order.createNewOrder(cart,user.getUserID() );
+                    if (check) {
+                        url = SUCCESS;
+                        session.setAttribute("CART", null);
+                        cart = null;
+                    } else {
+                        request.setAttribute("ERROR", order.getError());
                     }
+                    
+
+                } else {
+                    request.setAttribute("ERROR", "Your cart is empty!!!");
 
                 }
 
+            } else {
+                request.setAttribute("ERROR", "Error ocured, please try again!!!");
             }
 
         } catch (Exception e) {
-            log("Error at AdtToCartController: " + e.toString());
+            log("Error at CheckOutController:" + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

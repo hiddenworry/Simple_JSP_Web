@@ -10,8 +10,13 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import order.Order;
+import shopping.Cart;
 import utils.DBUtils;
 
 /**
@@ -27,7 +32,11 @@ public class ProductDAO {
     private static final String UPDATE_PRODUCT = "UPDATE tblProduct SET productName=?, price=?, quantity=?, importDate=?, usingDate=?, image=? WHERE productID=?";
     private static final String INSERT_PRODUCT = "INSERT INTO tblProduct (productID, productName, price, quantity, categoryID, importDate, usingDate, image) VALUES (?, ? , ? , ? , ?, ?, ?, ? )";
     private static final String CHECK_DUPLICATED = "SELECT productID FROM tblProduct where productID =?";
-    private static final String SEARCH_PRODUCT_BY_ID = "SELECT productName, price, quantity from tblProduct WHERE productID = ?";
+    private static final String SEARCH_PRODUCT_BY_ID = "SELECT productName, price from tblProduct WHERE productID = ?";
+    private static final String UPDATE_PRODUCT_QUATITY_BY_ID = "UPDATE tblProduct SET quantity=quantity-? from tblProduct WHERE productID = ?";
+    private static final String GET_PRODUCT_QUANTITY_BY_ID = "SELECT quantity from tblProduct where productID =?";
+    private static final String CREATE_ORDER = "INSERT INTO tblOrder (userID, total, orderDate ) VALUES(?,?,?)";
+    private static final String CREATE_ORDER_DETAIL = "INSERT INTO tblOrderDetail (orderID, productID, price, quantity) values (?,?,?,?)";
 
     public boolean checkDuplicated(String productID) throws SQLException {
         Connection conn = null;
@@ -167,13 +176,15 @@ public class ProductDAO {
                 ps = conn.prepareStatement(SEARCH_PRODUCT_BY_ID);
                 ps.setString(1, productID);
                 rs = ps.executeQuery();
-                while (rs.next()) {
+                if (rs.next()) {
 
                     String productName = rs.getNString("productName");
                     double price = rs.getDouble("price");
-                    int quantity = rs.getInt("quantity");
-                    product = new ProductDTO(productID, productName, price, quantity);
-                  
+                    product = new ProductDTO();
+                    product.setProductID(productID);
+                    product.setProductName(productName);
+                    product.setPrice(price);
+
                 }
             }
         } catch (Exception e) {
@@ -342,5 +353,184 @@ public class ProductDAO {
 
         }
         return cateList;
+    }
+
+    public boolean createOrder(Order order, Cart cart) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean check = true;
+        Calendar cal = Calendar.getInstance();
+        java.sql.Timestamp time = new Timestamp(cal.getTimeInMillis());
+        try {
+            conn = DBUtils.getConnection();
+            conn.setAutoCommit(false);
+            if (conn != null) {
+                ps = conn.prepareStatement(CREATE_ORDER, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, order.getUserID());
+                ps.setDouble(2, order.getTotal());
+                ps.setTimestamp(3, time);
+
+                ps.executeUpdate();
+                rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    String id = rs.getString(1);
+                    System.out.println(id);
+                    order.setOrderID(Integer.parseInt(id));
+
+                } else {
+                    check = false;
+                }
+
+                // insert into order detail nếu có lỗi rollback
+                for (ProductDTO product : cart.getCart().values()) {
+                    // Vong lap insert toan bo cac san pham trong cart vao order detail
+                    // setAutoCommit la flase de roolback khi gap loi
+                    ps = conn.prepareStatement(CREATE_ORDER_DETAIL);
+                    ps.setInt(1, order.getOrderID());
+                    ps.setString(2, product.getProductID());
+                    ps.setDouble(3, product.getPrice());
+                    ps.setInt(4, product.getQuantity());
+                    int row = ps.executeUpdate();
+                    if (row == 0) {
+                        check = false; // insert bị lỗi
+                    }
+                    // update số lượng sản phẩm trong database
+                    check = updateProductQuantityByID(product.getProductID(), product.getQuantity());
+
+                }
+                if (!check) {
+                    conn.rollback();
+                } else {
+                    conn.commit();
+                }
+
+            }
+
+        } catch (ClassNotFoundException | NumberFormatException | SQLException e) {
+            e.printStackTrace();
+            check = false;
+          
+           
+
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return check;
+
+    }
+
+    public boolean createOrderDetail(int orderID, Cart cart) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean check = true;
+        try {
+            conn = DBUtils.getConnection();
+            conn.setAutoCommit(false);
+            if (conn != null) {
+                for (ProductDTO product : cart.getCart().values()) {
+                    // Vong lap insert toan bo cac san pham trong cart vao order detail
+                    // setAutoCommit la flase de roolback khi gap loi
+                    ps = conn.prepareStatement(CREATE_ORDER_DETAIL);
+                    ps.setInt(1, orderID);
+                    ps.setString(2, product.getProductID());
+                    ps.setDouble(3, product.getPrice());
+                    ps.setInt(4, product.getQuantity());
+                    ps.executeUpdate();
+                }
+                conn.commit(); // khong gap loi thi commit cac thay doi
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return check = false;
+
+        } finally {
+
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return check;
+
+    }
+
+    public int getProductQuantityByID(String productID) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        int quantity = 0;
+
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                ps = conn.prepareStatement(GET_PRODUCT_QUANTITY_BY_ID);
+                ps.setString(1, productID);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+
+                    quantity = rs.getInt("quantity");
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return quantity;
+    }
+    // Update product quantity by product ID  
+
+    public boolean updateProductQuantityByID(String productID, int quantity) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean check = false;
+
+        try {
+            conn = DBUtils.getConnection();
+
+            if (conn != null) {
+                ps = conn.prepareStatement(UPDATE_PRODUCT_QUATITY_BY_ID);
+                ps.setInt(1, quantity);
+                ps.setString(2, productID);
+                check = ps.executeUpdate() > 0 ? true : false;
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+
+        }
+        return check;
     }
 }

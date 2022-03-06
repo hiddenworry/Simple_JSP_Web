@@ -23,13 +23,13 @@
     <body>
 
         <div class="container-fluid">
-            
-                <div class="Shopping-icon">
-                    <i class="fa fa-shopping-cart" style="font-size:50px"></i>
-                    <a id="view-cart-btn" href="viewcart.jsp">View Cart</a>
 
-                </div>
-         
+            <div class="Shopping-icon">
+                <i class="fa fa-shopping-cart" style="font-size:50px"></i>
+                <a id="view-cart-btn" href="viewcart.jsp">View Cart</a>
+
+            </div>
+
             <div class="nav-bar container-fluid row">
 
                 <div class="logo col-md-2">
@@ -38,7 +38,9 @@
                 <div class="search col-md-7">
                     <%
                         String searchStr = request.getParameter("Search");
-                        if (searchStr == null || searchStr.isEmpty()) searchStr = "%";
+                        if (searchStr == null || searchStr.isEmpty()) {
+                            searchStr = "%";
+                        }
                     %>
                     <form action="MainController">
                         <input class="input-search" type="text" name="Search" placeholder="Nhập sản phẩm bạn muốn mua"/>
@@ -89,11 +91,12 @@
                         <img class="card-img-top" src="<%= product.getImageLink()%>" alt="Card image cap">
                         <div class="card-block">
                             <form method="POST" action="MainController">
-                            <h4 class="card-title"><%=product.getProductName()%></h4>
-                            <p class="card-text">Price: $<%=product.getPrice()%></p>
-                            <input hidden="" value="<%=product.getProductID()%>" type="text" name="productID">
-                            <input  type="submit" name="action" value="AddToCart" class="add-to-cart btn btn-primary">
-                            <input type="text"  hidden="" name="Search" value="<%=searchStr%>">
+                                <h4 class="card-title"><%=product.getProductName()%></h4>
+                                <p class="card-text">Price: $<%=product.getPrice()%></p>
+                                <input hidden="" value="<%=product.getProductID()%>" type="text" name="productID">
+                                <input hidden="" value="1" type="number" name="quantity">
+                                <input  type="submit" name="action" value="AddToCart" class="add-to-cart btn btn-primary">
+                                <input type="text"  hidden="" name="Search" value="<%=searchStr%>">
                             </form>
                         </div>
                     </div>

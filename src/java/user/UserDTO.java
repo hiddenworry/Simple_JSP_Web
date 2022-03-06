@@ -18,6 +18,7 @@ public class UserDTO {
     private String birthday;
     private String phone;
     private boolean status;
+    private String email;
 
     public UserDTO() {
         this.userID = "";
@@ -28,6 +29,7 @@ public class UserDTO {
         this.birthday = "";
         this.phone = "";
         this.status = false;
+        this.email = "";
     }
     
     public UserDTO(String userID, String password, String fullName, boolean roleID, String address, String birthday, String phone, boolean status) {
@@ -109,6 +111,14 @@ public class UserDTO {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
     
      

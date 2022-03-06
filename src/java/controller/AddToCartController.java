@@ -40,10 +40,11 @@ public class AddToCartController extends HttpServlet {
                     cart = new Cart();
                 }
                 String productID = request.getParameter("productID");
+                int quantity  = Integer.parseInt(request.getParameter("quantity"));
                 product = dao.searchProductForSales(productID);
+                product.setQuantity(quantity);
                 // moi lan chi duoc them 1 san pham vao gio hang
                 if (product != null) {
-
                     check = cart.addToCart(product);
                     if (check) {
                         session.setAttribute("CART", cart);
