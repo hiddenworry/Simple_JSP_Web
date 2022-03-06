@@ -13,6 +13,7 @@
     </head>
     <body style="text-align: center">
         <h1>Order Successfully!!!</h1>
+        <h1>The email were send to your email address that you have input into the check out form!!!</h1>
         <a href="MainController?action=Search&Search=">Back To Shopping</a>
     </body>
 </html>

@@ -429,44 +429,7 @@ public class ProductDAO {
 
     }
 
-    public boolean createOrderDetail(int orderID, Cart cart) throws SQLException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        boolean check = true;
-        try {
-            conn = DBUtils.getConnection();
-            conn.setAutoCommit(false);
-            if (conn != null) {
-                for (ProductDTO product : cart.getCart().values()) {
-                    // Vong lap insert toan bo cac san pham trong cart vao order detail
-                    // setAutoCommit la flase de roolback khi gap loi
-                    ps = conn.prepareStatement(CREATE_ORDER_DETAIL);
-                    ps.setInt(1, orderID);
-                    ps.setString(2, product.getProductID());
-                    ps.setDouble(3, product.getPrice());
-                    ps.setInt(4, product.getQuantity());
-                    ps.executeUpdate();
-                }
-                conn.commit(); // khong gap loi thi commit cac thay doi
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return check = false;
-
-        } finally {
-
-            if (ps != null) {
-                ps.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-
-        }
-        return check;
-
-    }
+   
 
     public int getProductQuantityByID(String productID) throws SQLException {
         Connection conn = null;

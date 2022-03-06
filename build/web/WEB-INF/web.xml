@@ -56,6 +56,14 @@
         <servlet-name>CartConfirmController</servlet-name>
         <servlet-class>controller.CartConfirmController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReviewPayment</servlet-name>
+        <servlet-class>controller.ReviewPayment</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PaypalController</servlet-name>
+        <servlet-class>controller.PaypalController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>MainController</servlet-name>
         <url-pattern>/MainController</url-pattern>
@@ -107,6 +115,14 @@
     <servlet-mapping>
         <servlet-name>CartConfirmController</servlet-name>
         <url-pattern>/CartConfirmController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReviewPayment</servlet-name>
+        <url-pattern>/ReviewPayment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PaypalController</servlet-name>
+        <url-pattern>/PaypalController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

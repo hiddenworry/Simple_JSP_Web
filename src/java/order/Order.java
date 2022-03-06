@@ -66,15 +66,36 @@ public class Order extends OrderError {
     public void setTotal(double total) {
         this.total = total;
     }
-// Tao order va chen vao database
+
+    // Tao order va chen vao database
     // Create order phien ban public, dung de trien khai tat ca cac hoat dong khi tao order
     // Muốn tạo hóa đơn phải commit 2 quá trình: Tạo hóa đơn bên bản order
     // Và tạo chi tiết hóa dơn trên bản orderDetail
     // nếu 1 trong 2 quá trình bị lỗi thì sẽ roolback
     // Nếu thành công thì sẽ tiếp tục giảm số lượng của các sản phẩm đã bán
-
     public boolean createNewOrder(Cart cart, String userID) {
         boolean check = false;
+        ProductDAO dao = new ProductDAO();
+        try {
+            double totalMoney = checkOrder(cart);
+
+            if (totalMoney > -1) {
+                this.userID = userID;
+                check = dao.createOrder(this, cart);
+                
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        
+        return check;
+    }
+
+    // Ham se tra ve -1 neu hoa don khong hop le
+    // Se tra ve gia tien nieu hoa don hop le
+    public double checkOrder(Cart cart) {
         ProductDAO dao = new ProductDAO();
         double totalMoney = 0;
         try {
@@ -85,24 +106,20 @@ public class Order extends OrderError {
 
                 if (productQuantity > currentQuantity) {
                     this.totalError = "Some products are out of stock";
-                    return check;
+                    return -1;
                 } else {
                     totalMoney = totalMoney + product.getPrice() * productQuantity;
 
                 }
 
             }
-            this.setTotal(totalMoney);
-            this.setUserID(userID);
-            // gọi dao để insert dư liệu
-            check = dao.createOrder(this, cart);
 
         } catch (Exception e) {
+
             e.printStackTrace();
-
+            return -1;
         }
-
-        return check;
+        return totalMoney;
     }
 
 }

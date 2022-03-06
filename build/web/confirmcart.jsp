@@ -94,12 +94,14 @@
                 <form name="CheckOut" action="MainController" method="POST">
                     <span>Shipping Address:</span> <input type="text" name="ShipAddress" required=""><br>
                     <span>Phone:</span><input type="number" name="Phone" required=""><br>
-                    <span>Email: </span><input type="email" name="email" required=""><br>
-                    <span>Payment</span> 
-                    <select>
-                        <option>Payment in cash</option>
-                        <option>Paypal</option>
-                    </select>
+                    
+                    
+                    <br>
+                  
+                    <span>Payment after delivery</span><input required="" type="radio" name="Payment" value="PayAfterDelivery">
+                    <span>Pay with PayPal</span><input required="" type="radio" name="Payment" value="Paypal">
+                    
+                    
                     <input type="submit" name="action" required="" value="CheckOut">
                     <style>
                         .checkout input {

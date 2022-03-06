@@ -21,8 +21,6 @@ public class Cart {
         this.cart = cart;
     }
 
-  
-
     public Cart() {
         this.cart = new HashMap<>();
     }
@@ -61,9 +59,10 @@ public class Cart {
 
         }
         return check;
-    
+
     }
-     public boolean editCart(String productID, ProductDTO replaceProduct) {
+
+    public boolean editCart(String productID, ProductDTO replaceProduct) {
         boolean check = false;
         if (this.cart != null) {
             if (this.cart.containsKey(productID)) {
@@ -73,7 +72,20 @@ public class Cart {
 
         }
         return check;
-    
+
     }
-    
+
+    public double getCartVal() {
+        double totalMoney = 0;
+        try {
+            for (ProductDTO product : this.cart.values()) {
+                totalMoney = totalMoney + product.getPrice() * product.getQuantity();
+
+            }
+        } catch (Exception e) {
+
+        }
+        return totalMoney;
+    }
+
 }

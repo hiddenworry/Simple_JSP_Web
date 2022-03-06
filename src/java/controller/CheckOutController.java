@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import mail.JavaSendMail;
 import order.Order;
 import shopping.Cart;
 import user.UserDTO;
@@ -23,6 +24,9 @@ public class CheckOutController extends HttpServlet {
 
     private static final String ERROR = "error.jsp";
     private static final String SUCCESS = "success.jsp";
+    private static final String PAYPAL = "Paypal";
+    private static final String PAY_AFTER_DELIVERY = "PayAfterDelivery";
+    private static final String PAYPALCONTROLLER = "PaypalController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,26 +34,36 @@ public class CheckOutController extends HttpServlet {
         String url = ERROR;
         try {
             HttpSession session = request.getSession();
-            
+
             boolean check = false;
             if (session != null) {
                 Cart cart = (Cart) session.getAttribute("CART");
                 UserDTO user = (UserDTO) session.getAttribute("USER");
                 if (cart != null || !cart.getCart().isEmpty()) {
-                    Order order = new Order();
-                    
-                    
-                    
-                    
-                    check = order.createNewOrder(cart,user.getUserID() );
-                    if (check) {
-                        url = SUCCESS;
-                        session.setAttribute("CART", null);
-                        cart = null;
-                    } else {
-                        request.setAttribute("ERROR", order.getError());
+                    String payment = request.getParameter("Payment");
+                    String PAYPAL_SUCCESS = (String) request.getAttribute("PAYPAL_SUCCESS");
+
+                    // Bien PAYPAL_SUCEESS se nhan tin hieu thanh toan paypal thanh cong
+                    // Sau khi PAYPAL_SUCESS = true thi bat dau inser Order vao database
+                    if (PAYPAL.equals(payment)) {
+                        // forward vao PaypalController
+                        url = PAYPALCONTROLLER;
+
+                    } else if (PAY_AFTER_DELIVERY.equals(payment) || "true".equals(PAYPAL_SUCCESS)) {
+                        Order order = new Order();
+                        check = order.createNewOrder(cart, user.getUserID());
+                        if (check) {
+                            url = SUCCESS;
+                            session.setAttribute("CART", null);
+                            cart = null;
+
+                            // Gui mail xac nhan
+                            JavaSendMail j = new JavaSendMail();
+                            j.sendMail(user.getEmail(), "Xac nhan don hang", "Don hang"  + order.getOrderID() +"se duocc chuyen đen trong vai ngay nua :)) form SE151333 Asignment");
+                        } else {
+                            request.setAttribute("ERROR", order.getError());
+                        }
                     }
-                    
 
                 } else {
                     request.setAttribute("ERROR", "Your cart is empty!!!");
