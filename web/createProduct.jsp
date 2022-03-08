@@ -4,6 +4,7 @@
     Author     : ADMIN
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.util.List"%>
 <%@page import="product.ProductDAO"%>
 <%@page import="product.ProductError"%>
@@ -13,13 +14,18 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title> Create Product</title>
+         <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==false) }">
+            <c:redirect url="login.jsp"></c:redirect>
+
+        </c:if>
+
+
+
 
         <style>
             .container{
                 margin:auto;
             }
-
-
 
             span { display: table-cell; }
 
@@ -41,7 +47,7 @@
             }
 
             .Error{
-                
+
                 color: red;
             }
 
@@ -49,7 +55,7 @@
         </style>
     </head>
     <body>
-
+       
         <%
             ProductError error = (ProductError) request.getAttribute("ERROR");
 
@@ -76,8 +82,8 @@
                     <span>Category</span>
                     <select name="category">
                         <%
-                            ProductDAO dao = new ProductDAO();
-                            List<String> categoryList = (List<String>) dao.getProCateList();
+
+                            List<String> categoryList = (List<String>) request.getAttribute("CATE_LIST");
                             if (categoryList != null) {
                                 if (categoryList.size() > 0) {
                                     for (String category : categoryList) {
@@ -108,11 +114,13 @@
                     <a href="admin.jsp" style="margin-top: 10px">Back to Admin Page </a>
                 </div>
             </form>
-                    <%
-                            String message = (String)request.getAttribute("MESSAGE");
-                            if (message == null) message = "";
-                            %>
-                            <div style="text-align: center; color: green;"><%=message%></div>  
+            <%
+                String message = (String) request.getAttribute("MESSAGE");
+                if (message == null) {
+                    message = "";
+                }
+            %>
+            <div style="text-align: center; color: green;"><%=message%></div>  
         </div>
 
     </body>

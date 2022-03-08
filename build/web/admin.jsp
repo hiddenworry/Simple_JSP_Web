@@ -4,6 +4,7 @@
     Author     : ADMIN
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="product.ProductError"%>
 <%@page import="product.ProductDTO"%>
 <%@page import="java.util.List"%>
@@ -14,6 +15,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Admin Page</title>
+
+        <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==false) }">
+            <c:redirect url="login.jsp"></c:redirect>
+
+        </c:if>
+
         <style>
             td, tr, th {
                 text-align: center;
@@ -21,32 +28,22 @@
                 padding: 1px;
 
             }
-            
+
 
         </style>
     </head>
     <body>
-        <% UserDTO admin = (UserDTO) session.getAttribute("USER");
-            if (admin == null || !admin.isAdmin()) {
-                response.sendRedirect("login.jsp");
-                return;
-            }
-            String searchStr = request.getParameter("Search");
-            if (searchStr == null) {
-                searchStr = "";
-            }
-        %>
-        <h1>Hello <%=admin.getFullName()%> </h1>
+
+        <h1>Hello ${sessionScope.USER .getFullName()} </h1>
 
         <form action="MainController" method="POST">
-            <input type="text" name="Search" value="<%=searchStr%>">
+            <input type="text" name="Search" value="${param.Search}">
             <input type="submit" name="action" value="Search">   
-
         </form>
         <a href="MainController?action=LogOut">LogOut</a>    
-        <button><a href="createProduct.jsp">Insert new Product</a></button>
+        <button><a href="MainController?action=GetCategory">Insert new Product</a></button>
         <% int count = 1;
-            List<ProductDTO> productList = (List<ProductDTO>) request.getAttribute("productList");
+            List<ProductDTO> productList = (List<ProductDTO>) request.getAttribute("PRODUCT_LIST");
             if (productList != null) {
                 if (!productList.isEmpty()) {
 
@@ -54,7 +51,6 @@
         %>
         <table style="margin-top: 20px">
             <thead>
-
                 <tr>
                     <th>Row</th>
                     <th>productID</th>
@@ -68,67 +64,65 @@
                     <td>Update</td>
                     <th>Delete</th>
                     <th>Status</th>
-
                 </tr>
-
-
             </thead>
             <tbody>
+         
+
                 <%  String status = "";
                     String color = "";
                     ProductError expiredError = new ProductError();
                     for (ProductDTO product : productList) {
-                            // check ngay het han cua san pham
-                            String importDate = product.getImportDate();
-                            String usingDate = product.getUsingDate();
-                            if ( !expiredError.isValidDateError(importDate, usingDate )){
-                                status = "Expired";
-                                color = "red";
+                        // check ngay het han cua san pham
+                        String importDate = product.getImportDate();
+                        String usingDate = product.getUsingDate();
+                        if (!expiredError.isValidDateError(importDate, usingDate)) {
+                            status = "Expired";
+                            color = "red";
 
-                            } else{
-                                status = "Usable";
-                                color = "green";
-                            }
+                        } else {
+                            status = "Usable";
+                            color = "green";
+                        }
                 %>
                 <tr>
-            <form action="MainController" method="POST" enctype="multipart/form-data">
-           
-                <td>
-                    <input type="hidden" name="position" value="<%=count%>">
+                       <form action="MainController" method="POST">
+                    <td>
+                        <input type="hidden" name="position" value="<%=count%>">
 
-                    <%=count++%>
+                        <%=count++%>
 
-                </td>
+                    </td>
 
-                <td> <%=product.getProductID()%>
-                    <input type="hidden" name="productID" value="<%=product.getProductID()%>">
+                    <td> <%=product.getProductID()%>
+                        <input type="hidden" name="productID" value="<%=product.getProductID()%>">
 
-                </td>
-                <td> 
-                    <input type="text" value="<%=product.getProductName()%>" name="productName"> 
-                    <input type="hidden" name="Search"value="<%=searchStr%>">
-                </td>
-                <td> <input type="number" value="<%=product.getPrice()%>" name="price" step="any"></td>
-                <td> <input type="number" value="<%=product.getQuantity()%>" name="quantity"></td>
-                <td> <%=product.getCategoryID()%></td>
-                <td> <input type="text" value="<%=product.getImportDate()%>" name="importDate"></td>
-                <td> <input type="text" value="<%=product.getUsingDate()%>" name="usingDate"></td>
-                <td> <a href="<%=product.getImageLink()%>" style="text-align: center">  View</a><input name="imagePath" type="text" style="margin-left: 20px"value="<%= product.getImageLink()%>"></td>
-                <td>
-                    <input type="submit" name="action" value="Update">
-                </td>
-           
+                    </td>
+                    <td> 
+                        <input type="text" value="<%=product.getProductName()%>" name="productName"> 
+                        <input type="hidden" name="Search"value="${param.Search}">
+                    </td>
+                    <td> <input type="number" value="<%=product.getPrice()%>" name="price" step="any"></td>
+                    <td> <input type="number" value="<%=product.getQuantity()%>" name="quantity"></td>
+                    <td> <%=product.getCategoryID()%></td>
+                    <td> <input type="text" value="<%=product.getImportDate()%>" name="importDate"></td>
+                    <td> <input type="text" value="<%=product.getUsingDate()%>" name="usingDate"></td>
+                    <td> <a href="<%=product.getImageLink()%>" style="text-align: center">  View</a><input name="imagePath" type="text" style="margin-left: 20px"value="<%= product.getImageLink()%>"></td>
+                    <td>
+                        <input type="submit" name="action" value="Update">
+                    </td>
+
             </form>
-                
-                
+
+
             <td>
                 <form action="MainController" method="POST">
                     <input type="hidden" name="productID" value="<%=product.getProductID()%>" >
-                    <input type="hidden" name="Search"value="<%=searchStr%>">
+                    <input type="hidden" name="Search"value="${param.Search}">
                     <input type="submit" name="action" value="Delete">
                 </form>
             </td>
-            
+
             <td style="color: <%=color%>"><%=status%></td>
 
         </tr>
@@ -144,24 +138,15 @@
 
 
 </table>
-<%
-    ProductError error = (ProductError) request.getAttribute("ERROR");
-%>
 
-<%
-    String errorMessage;
-    if (error == null) {
-        errorMessage = "";
-
-    } else {
-
-        errorMessage = "Update Error at row " + error.getLine() + ":" + error.getProductIDError() + "<br>"
-                + "<br>" + error.getProductNameError() + "<br>" + error.getProductPrice() + "<br>" + error.getProductQuantityError()
-                + "<br>" + error.getProductCateIDError() + "<br>" + error.getProductImportDateError() + "<br>" + error.getProductUsingDateError()
-                + "<br>" + error.getInvalidDateError()+ "<br>" + error.getImageError();
-    }
-%>
 <br>
-<span style="color: red"><%=errorMessage%></span>
+<span style="color: red">${requestScope.ERROR.getLine()}</span>
+<span style="color: red">${requestScope.ERROR.getProductNameError()}</span>
+<span style="color: red">${requestScope.ERROR.getProductPrice()}</span>
+<span style="color: red">${requestScope.ERROR.getProductQuantityError()}</span>
+<span style="color: red">${requestScope.ERROR.getProductImportDateError()}</span>
+<span style="color: red">${requestScope.ERROR.getProductUsingDateError()}</span>
+<span style="color: red">${requestScope.ERROR.getInvalidDateError()}</span>
+<span style="color: red">${requestScope.ERROR.getImageError()}</span>
 </body>
 </html>

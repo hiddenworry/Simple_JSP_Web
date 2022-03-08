@@ -30,6 +30,8 @@ public class MainController extends HttpServlet {
     private static final String UPDATE_CONTROLLER = "UpdateController";
     private static final String DELETE = "Delete";
     private static final String DELETE_CONTROLLER = "DeleteController";
+    private static final String GET_PRODUCT_CATEGORY = "GetCategory";// dung de render ra tat ca cac product category trong databse truoc khi vao trang creaproduct.jsp
+    private static final String GET_PRODUCT_CATE_CONTROLLER = "GetProductCateController";
     private static final String CREATE_PRODUCT = "CreateProduct";
     private static final String CREATE_PRODUCT_CONTROLLER = "CreateProductController";
     private static final String ADD_TO_CART = "AddToCart";
@@ -42,6 +44,7 @@ public class MainController extends HttpServlet {
     private static final String CART_CONFIRM_CONTROLLER = "CartConfirmController";
     private static final String CHECK_OUT = "CheckOut";
     private static final String CHECK_OUT_CONTROLLER = "CheckOutController";
+    private static final String RECAPCHAR = "Recapchar";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -50,12 +53,15 @@ public class MainController extends HttpServlet {
         try {
             String action = request.getParameter("action");
             String loginCode = request.getParameter("code");
+            String recapchar = request.getParameter("Recapchar");
             if ((LOGIN.equals(action) || loginCode != null)) {
-
                 url = LOGIN_CONTROLLER;
             } else if (SEARCH.equals(action)) {
                 url = SEARCH_CONTROLLER;
-            } else if (LOGOUT.equals(action)) {
+            }else if (RECAPCHAR.equals(recapchar)) {
+                url = LOGIN_CONTROLLER;
+            }
+            else if (LOGOUT.equals(action)) {
                 url = LOGOUT_CONTROLLER;
             } else if (UPDATE.equals(action)) {
                 url = UPDATE_CONTROLLER;
@@ -71,9 +77,11 @@ public class MainController extends HttpServlet {
                 url = EDIT_CART_CONTROLLER;
             } else if (CHECK_OUT.equals(action)) {
                 url = CHECK_OUT_CONTROLLER;
-            }
-            else if (CART_COFIRM.equals(action)) {
+            } else if (CART_COFIRM.equals(action)) {
                 url = CART_CONFIRM_CONTROLLER;
+            }
+            else if (GET_PRODUCT_CATEGORY.equals(action)) {
+                url = GET_PRODUCT_CATE_CONTROLLER;
             }
 
         } catch (Exception e) {

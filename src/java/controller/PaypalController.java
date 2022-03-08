@@ -25,8 +25,8 @@ import user.UserDTO;
  */
 public class PaypalController extends HttpServlet {
 
-    private static final String SUCCESS = "";
-    private static final String ERROR = "";
+    // Redirect page duoc cai dat tai class paypallService
+    private static final String ERROR = "error.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -35,16 +35,15 @@ public class PaypalController extends HttpServlet {
         try {
             HttpSession session = request.getSession();
             UserDTO user = (UserDTO) session.getAttribute("USER");
-            Cart cart = (Cart) session.getAttribute("CART");
-            Order order = new Order();
 
             String productName, subtotal, shipping, tax, total;
+            double totalPrice = (double)request.getAttribute("TOTAL");
             productName = user.getUserID();// LAy ten san pham bang ten cua userID
-            Double price = order.checkOrder(cart);
-            if (price < 0) {
+            if (totalPrice < 0) {
                 request.setAttribute("ERROR", "Invalid Order!!!");
+
             } else {
-                subtotal = String.valueOf(price);
+                subtotal = String.valueOf(totalPrice);
                 shipping = "0";
                 tax = "0.1";
                 total = String.valueOf(Double.parseDouble(subtotal)
@@ -54,7 +53,7 @@ public class PaypalController extends HttpServlet {
                 url = paymentService.authourizePayment(orderDetail);
             }
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         } finally {
             response.sendRedirect(url);
         }

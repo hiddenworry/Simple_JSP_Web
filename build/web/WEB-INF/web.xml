@@ -64,6 +64,14 @@
         <servlet-name>PaypalController</servlet-name>
         <servlet-class>controller.PaypalController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>GetProductCateController</servlet-name>
+        <servlet-class>controller.GetProductCateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Test</servlet-name>
+        <servlet-class>controller.Test</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>MainController</servlet-name>
         <url-pattern>/MainController</url-pattern>
@@ -123,6 +131,14 @@
     <servlet-mapping>
         <servlet-name>PaypalController</servlet-name>
         <url-pattern>/PaypalController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GetProductCateController</servlet-name>
+        <url-pattern>/GetProductCateController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Test</servlet-name>
+        <url-pattern>/Test</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

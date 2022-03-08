@@ -3,7 +3,7 @@
     Created on : Jan 26, 2022, 9:40:15 AM
     Author     : ADMIN
 --%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.util.List"%>
 <%@page import="product.ProductDTO"%>
 <%@page import="user.UserDTO"%>
@@ -14,11 +14,18 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--        Bootrap link-->
 
+        <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==true) }">
+            <c:redirect url="login.jsp"></c:redirect>
+        </c:if>
+       
+
+
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
               integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link href="css/homestyles.css" rel="stylesheet" type="text/css"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <title>Organic Store</title>
+
     </head>
     <body>
 
@@ -36,35 +43,16 @@
                     <a href=""> ORGANIC </a>
                 </div>
                 <div class="search col-md-7">
-                    <%
-                        String searchStr = request.getParameter("Search");
-                        if (searchStr == null || searchStr.isEmpty()) {
-                            searchStr = "%";
-                        }
-                    %>
-                    <form action="MainController">
-                        <input class="input-search" type="text" name="Search" placeholder="Nhập sản phẩm bạn muốn mua"/>
 
+                    <form action="MainController">
+                        <input class="input-search" type="text" value="${Search}"name="Search" placeholder="Nhập sản phẩm bạn muốn mua"/>
                         <input type="submit" name="action" value="Search"/>
                     </form>
                 </div>
                 <div class="login col-md-2"> 
-                    <%
-                        String link = "login.jsp";
-                        String value = "Login";
-                        UserDTO user = (UserDTO) session.getAttribute("USER");
-                        if (user == null || user.isAdmin()) {
-                            response.sendRedirect("login.jsp");
-                            return;
-                        }
-                        String userFullName = user.getFullName();
-                        link = "###";
-                        value = userFullName;
 
 
-                    %>
-
-                    <a href="<%=link%>"> <%=value%></a>
+                    <a href="####"> ${sessionScope.USER.getFullName()}</a>
                 </div>
                 <div class="sign-up col-md-1">
                     <a href="MainController?action=LogOut">Log Out</a>
@@ -75,51 +63,29 @@
             <!-- Main -->
             <div class="container shopping-cart">
                 <div class="row">
-                    <%
+                    <c:forEach var="product" items="${requestScope.PRODUCT_LIST}">
 
-                        List<ProductDTO> productList = (List<ProductDTO>) request.getAttribute("productList");
-                        if (productList != null) {
-                    %>
-
-                    <%
-                        if (!productList.isEmpty()) {
-                            for (ProductDTO product : productList) {
-
-                    %>
-
-                    <div class="card" style="width: 20rem;">
-                        <img class="card-img-top" src="<%= product.getImageLink()%>" alt="Card image cap">
-                        <div class="card-block">
-                            <form method="POST" action="MainController">
-                                <h4 class="card-title"><%=product.getProductName()%></h4>
-                                <p class="card-text">Price: $<%=product.getPrice()%></p>
-                                <input hidden="" value="<%=product.getProductID()%>" type="text" name="productID">
-                                <input hidden="" value="1" type="number" name="quantity">
-                                <input  type="submit" name="action" value="AddToCart" class="add-to-cart btn btn-primary">
-                                <input type="text"  hidden="" name="Search" value="<%=searchStr%>">
-                            </form>
+                        <div class="card" style="width: 20rem;">
+                            <img class="card-img-top" src="${product.imageLink}" alt="Card image">
+                            <div class="card-block">
+                                <form method="POST" action="MainController">
+                                    <h4 class="card-title">${product.productName}</h4>
+                                    <p class="card-text">Price: ${product.price}</p>
+                                    <input hidden="" value="${product.productID}" type="text" name="productID">
+                                    <input hidden="" value="1" type="number" name="quantity">
+                                    <input  type="submit" name="action" value="AddToCart" class="add-to-cart btn btn-primary">
+                                    <input type="text"  hidden="" name="Search" value="${Search}">
+                                </form>
+                            </div>
                         </div>
-                    </div>
+                    </c:forEach>
 
 
-                    <%           }
-                            }
-                        }
 
 
-                    %>
-
-                    <%                    String error = (String) request.getAttribute("ERROR");
-                        if (error == null) {
-                            error = "";
-                        }
-                    %>
-                    <div style="color: graytext"><%=error%></div>
+                    <div style="color: graytext">${requestScope.ERROR}</div>
                 </div>
             </div>
-
-
-
         </div> 
 
     </style>

@@ -79,8 +79,9 @@ public class Order extends OrderError {
         try {
             double totalMoney = checkOrder(cart);
 
-            if (totalMoney > -1) {
+            if (totalMoney > 0) {
                 this.userID = userID;
+                this.total = totalMoney;
                 check = dao.createOrder(this, cart);
                 
                 
@@ -106,7 +107,7 @@ public class Order extends OrderError {
 
                 if (productQuantity > currentQuantity) {
                     this.totalError = "Some products are out of stock";
-                    return -1;
+                    return 0;
                 } else {
                     totalMoney = totalMoney + product.getPrice() * productQuantity;
 
@@ -117,7 +118,7 @@ public class Order extends OrderError {
         } catch (Exception e) {
 
             e.printStackTrace();
-            return -1;
+            return 0;
         }
         return totalMoney;
     }

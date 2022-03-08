@@ -22,7 +22,8 @@ public class UpdateController extends HttpServlet {
 
     private static final String ERROR = "SearchController";
     private static final String SUCCESS = "SearchController";
-    private static final String IMAGE_CONTROLLER = "ImageController";
+    private static final String SYS_ERROR = " error.jsp";
+  
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -51,7 +52,7 @@ public class UpdateController extends HttpServlet {
                 proError.setProductPriceError("The product price must be posivtive number and > 0");
                 validation = false;
             }
-            if (quantity < 0) {
+            if (quantity <= 0) {
                 proError.setProductQuantity("The quatity must be a number and >= 0 ");
                 validation = false;
 
@@ -88,13 +89,15 @@ public class UpdateController extends HttpServlet {
                 if (check) {
                     url = SUCCESS;
                 } else {
-                    proError.setLine(position);
-                    request.setAttribute("ERROR", proError);
+                  
+                    request.setAttribute("ERROR", "System error please try again!!!");
+                    url = SYS_ERROR;
 
                 }
             } else {
-                proError.setLine(position);
+                proError.setLine("Error at row " + position + " :");
                 request.setAttribute("ERROR", proError);
+                
 
             }
 

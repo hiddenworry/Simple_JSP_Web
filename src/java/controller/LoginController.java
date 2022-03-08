@@ -22,7 +22,6 @@ public class LoginController extends HttpServlet {
 
     private static final String ERROR = "login.jsp";
     private static final String GOOGLE_CONTROLLER = "GoogleLoginController";
-    private static final String RECAPCHAR_CONTROLLER = "RecapcharController";
     private static final String ADMIN_PAGE = "admin.jsp";
     private static final String SEARCH_COMTROLLER = "SearchController";
 
@@ -33,36 +32,38 @@ public class LoginController extends HttpServlet {
         try {
             // xem co dang nhap bang google ko
             String logincode = request.getParameter("code");
+  
+                if (logincode != null) {
+                    url = GOOGLE_CONTROLLER;
+                } else {
+                    String userID = request.getParameter("userID");
+                    String password = request.getParameter("password");
+                    UserDAO dao = new UserDAO();
+                    UserDTO user = dao.login(userID, password);
 
-            if (logincode != null) {
-                url = GOOGLE_CONTROLLER;
-            } else {
-                String userID = request.getParameter("userID");
-                String password = request.getParameter("password");
-                UserDAO dao = new UserDAO();
-                UserDTO user = dao.login(userID, password);
+                    if (user != null) {
+                        HttpSession session = request.getSession();
+                        session.setAttribute("USER", user);
 
-                if (user != null) {
-                    HttpSession session = request.getSession();
-                    session.setAttribute("USER", user);
+                        if (user.isAdmin()) {
+                            url = ADMIN_PAGE;
+                        } else if (user.isAdmin() == false) {
+                            url = SEARCH_COMTROLLER; // forward vao SearchController de render ra view cho User
 
-                    if (user.isAdmin()) {
-                        url = ADMIN_PAGE;
-                    } else if (user.isAdmin() == false) {
-                        url = SEARCH_COMTROLLER; // forward vao SearchController de render ra view cho User
+                            request.setAttribute("GET_ALL_PRODUCT", "%");
+                            // Truyen parameter "%" de lay toan bo product va render ra
 
-                        request.setAttribute("GET_ALL_PRODUCT", "%");
-                        // Truyen parameter "%" de lay toan bo product va render ra
+                        } else {
+                            request.setAttribute("ERROR", "Your role is not support");
+
+                        }
 
                     } else {
-                        request.setAttribute("ERROR", "Your role is not support");
-
+                        request.setAttribute("ERROR", "Incorect UserId or Password");
                     }
+                } 
 
-                } else {
-                    request.setAttribute("ERROR", "Incorect UserId or Password");
-                }
-            }
+            
 
         } catch (Exception e) {
             log("Error occur at LoginController: " + e.toString());

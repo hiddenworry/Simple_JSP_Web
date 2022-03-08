@@ -20,8 +20,8 @@ import product.ProductError;
  */
 public class CreateProductController extends HttpServlet {
 
-    private static final String ERROR = "createProduct.jsp";
-    private static final String SUCCESS = "createProduct.jsp";
+    private static final String ERROR = "GetProductCateController";
+    private static final String SUCCESS = "GetProductCateController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,6 +29,7 @@ public class CreateProductController extends HttpServlet {
 
         String url = ERROR;
         try {
+           
             String productID = request.getParameter("productID");
             String productName = request.getParameter("productName");
             Double price = Double.parseDouble(request.getParameter("price"));

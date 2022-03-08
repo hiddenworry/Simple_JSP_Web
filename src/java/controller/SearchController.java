@@ -61,10 +61,10 @@ public class SearchController extends HttpServlet {
 
             }
 
-            if (!productList.isEmpty() || productList != null) {
-                request.setAttribute("productList", productList);
+            if (!productList.isEmpty()) {
+                request.setAttribute("PRODUCT_LIST", productList);
 
-            } else {
+            } else if(productList.isEmpty() || productList == null) {
                 request.setAttribute("ERROR", "The product not found!!!");
 
             }

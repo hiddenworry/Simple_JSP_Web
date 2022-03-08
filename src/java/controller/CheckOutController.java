@@ -39,86 +39,97 @@ public class CheckOutController extends HttpServlet {
             if (session != null) {
                 Cart cart = (Cart) session.getAttribute("CART");
                 UserDTO user = (UserDTO) session.getAttribute("USER");
+                Order order = new Order();
+                double total = order.checkOrder(cart);
+
                 if (cart != null || !cart.getCart().isEmpty()) {
                     String payment = request.getParameter("Payment");
                     String PAYPAL_SUCCESS = (String) request.getAttribute("PAYPAL_SUCCESS");
+                    if (total != 0) {
+                       
+                        // Bien PAYPAL_SUCEESS se nhan tin hieu thanh toan paypal thanh cong
+                        // Sau khi PAYPAL_SUCESS = true thi bat dau inser Order vao database
+                        if (PAYPAL.equals(payment)) {
+                             request.setAttribute("TOTAL", total);
+                            // forward vao PaypalController
+                            url = PAYPALCONTROLLER;
 
-                    // Bien PAYPAL_SUCEESS se nhan tin hieu thanh toan paypal thanh cong
-                    // Sau khi PAYPAL_SUCESS = true thi bat dau inser Order vao database
-                    if (PAYPAL.equals(payment)) {
-                        // forward vao PaypalController
-                        url = PAYPALCONTROLLER;
+                        } else if (PAY_AFTER_DELIVERY.equals(payment) || "true".equals(PAYPAL_SUCCESS)) {
 
-                    } else if (PAY_AFTER_DELIVERY.equals(payment) || "true".equals(PAYPAL_SUCCESS)) {
-                        Order order = new Order();
-                        check = order.createNewOrder(cart, user.getUserID());
-                        if (check) {
-                            url = SUCCESS;
-                            session.setAttribute("CART", null);
-                            cart = null;
+                            check = order.createNewOrder(cart, user.getUserID());
+                            if (check) {
+                                url = SUCCESS;
+                                session.setAttribute("CART", null);
+                                cart = null;
 
-                            // Gui mail xac nhan
-                            JavaSendMail j = new JavaSendMail();
-                            j.sendMail(user.getEmail(), "Xac nhan don hang", "Don hang"  + order.getOrderID() +"se duocc chuyen đen trong vai ngay nua :)) form SE151333 Asignment");
-                        } else {
-                            request.setAttribute("ERROR", order.getError());
+                                // Gui mail xac nhan
+                                JavaSendMail j = new JavaSendMail();
+                                j.sendMail(user.getEmail(), "Xac nhan don hang", "Don hang" + order.getOrderID() + "se duocc chuyen đen trong vai ngay nua :)) form SE151333 Asignment");
+                            } else {
+                                request.setAttribute("ERROR", order.getError());
+                            }
                         }
                     }
 
-                } else {
-                    request.setAttribute("ERROR", "Your cart is empty!!!");
+                    } else {
+                        request.setAttribute("ERROR", "Your cart is empty!!!");
 
+                    }
+
+                } else {
+                    request.setAttribute("ERROR", "Error ocured, please try again!!!");
                 }
 
-            } else {
-                request.setAttribute("ERROR", "Error ocured, please try again!!!");
-            }
-
-        } catch (Exception e) {
+            }catch (Exception e) {
             log("Error at CheckOutController:" + e.toString());
-        } finally {
+        }finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
 
-    }
+        }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+        /**
+         * Handles the HTTP <code>GET</code> method.
+         *
+         * @param request servlet request
+         * @param response servlet response
+         * @throws ServletException if a servlet-specific error occurs
+         * @throws IOException if an I/O error occurs
+         */
+        @Override
+        protected void doGet
+        (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            processRequest(request, response);
+        }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        /**
+         * Handles the HTTP <code>POST</code> method.
+         *
+         * @param request servlet request
+         * @param response servlet response
+         * @throws ServletException if a servlet-specific error occurs
+         * @throws IOException if an I/O error occurs
+         */
+        @Override
+        protected void doPost
+        (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
+            processRequest(request, response);
+        }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
+        /**
+         * Returns a short description of the servlet.
+         *
+         * @return a String containing servlet description
+         */
+        @Override
+        public String getServletInfo
+        
+        
+            () {
         return "Short description";
-    }// </editor-fold>
+        }// </editor-fold>
 
-}
+    }
