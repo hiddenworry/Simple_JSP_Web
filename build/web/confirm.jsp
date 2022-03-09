@@ -12,7 +12,6 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
     <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==false) }">
         <c:redirect url="login.jsp"></c:redirect>
 

@@ -14,9 +14,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--        Bootrap link-->
 
+      
         <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==true) }">
             <c:redirect url="login.jsp"></c:redirect>
         </c:if>
+       
        
 
 

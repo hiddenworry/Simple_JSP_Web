@@ -14,10 +14,11 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title> Create Product</title>
-         <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==false) }">
+        <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==false) }">
             <c:redirect url="login.jsp"></c:redirect>
 
         </c:if>
+
 
 
 
@@ -55,7 +56,7 @@
         </style>
     </head>
     <body>
-       
+
         <%
             ProductError error = (ProductError) request.getAttribute("ERROR");
 
@@ -81,26 +82,9 @@
                 <div>
                     <span>Category</span>
                     <select name="category">
-                        <%
-
-                            List<String> categoryList = (List<String>) request.getAttribute("CATE_LIST");
-                            if (categoryList != null) {
-                                if (categoryList.size() > 0) {
-                                    for (String category : categoryList) {
-                        %>
-                        <option  value="<%=category%>"><%=category%></option>
-
-
-
-                        <%
-                                    }
-
-                                }
-                            }
-
-
-                        %>
-
+                        <c:forEach var="category" items="${requestScope.CATE_LIST}">
+                            <option  value="${category}">${category}</option>
+                        </c:forEach>
                     </select>
 
 
@@ -114,13 +98,8 @@
                     <a href="admin.jsp" style="margin-top: 10px">Back to Admin Page </a>
                 </div>
             </form>
-            <%
-                String message = (String) request.getAttribute("MESSAGE");
-                if (message == null) {
-                    message = "";
-                }
-            %>
-            <div style="text-align: center; color: green;"><%=message%></div>  
+
+            <div style="text-align: center; color: green;">${requestScope.MESSAGE}</div>  
         </div>
 
     </body>

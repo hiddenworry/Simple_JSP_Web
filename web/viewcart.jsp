@@ -13,10 +13,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>ViewCart Page</title>
         <link href="css/viewcart.css" rel="stylesheet" type="text/css"/>
-    <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==true) }">
-        <c:redirect url="login.jsp"></c:redirect>
-
-    </c:if>
+        
+        <c:if test="${sessionScope.USER == null or (sessionScope.USER.isAdmin()==true) }">
+            <c:redirect url="login.jsp"></c:redirect>
+        </c:if>
+       
 </head>
 <body>
     <div class="container">

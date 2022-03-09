@@ -22,7 +22,6 @@ public class LoginController extends HttpServlet {
 
     private static final String ERROR = "login.jsp";
     private static final String GOOGLE_CONTROLLER = "GoogleLoginController";
-    private static final String ADMIN_PAGE = "admin.jsp";
     private static final String SEARCH_COMTROLLER = "SearchController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -46,7 +45,8 @@ public class LoginController extends HttpServlet {
                         session.setAttribute("USER", user);
 
                         if (user.isAdmin()) {
-                            url = ADMIN_PAGE;
+                            url = SEARCH_COMTROLLER;
+                            request.setAttribute("GET_ALL_PRODUCT", "%");
                         } else if (user.isAdmin() == false) {
                             url = SEARCH_COMTROLLER; // forward vao SearchController de render ra view cho User
 
